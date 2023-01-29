@@ -1,0 +1,339 @@
+{
+ "cells": [
+  {
+   "cell_type": "code",
+   "execution_count": 1,
+   "id": "fe0e1d8b-51fa-4474-a45a-8fbe8ee7d8b2",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "import pandas as pd\n",
+    "import numpy\n",
+    "from sklearn.feature_extraction.text import CountVectorizer"
+   ]
+  },
+  {
+   "cell_type": "raw",
+   "id": "9ea05eb9-4abe-4e3c-920d-2e29b3dc8951",
+   "metadata": {},
+   "source": [
+    "Importing the the data  and printing the first five rows\n"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 2,
+   "id": "581f65a9-fa03-4ed1-ad6c-4be6fdc03d3b",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "data = pd.read_csv(\"r_dataset.csv\")\n"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 3,
+   "id": "3a843105-c9fe-485b-aae8-2c1fd455105c",
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/html": [
+       "<div>\n",
+       "<style scoped>\n",
+       "    .dataframe tbody tr th:only-of-type {\n",
+       "        vertical-align: middle;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe tbody tr th {\n",
+       "        vertical-align: top;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe thead th {\n",
+       "        text-align: right;\n",
+       "    }\n",
+       "</style>\n",
+       "<table border=\"1\" class=\"dataframe\">\n",
+       "  <thead>\n",
+       "    <tr style=\"text-align: right;\">\n",
+       "      <th></th>\n",
+       "      <th>cuisine</th>\n",
+       "      <th>Numbers of order</th>\n",
+       "      <th>Customer_id</th>\n",
+       "    </tr>\n",
+       "  </thead>\n",
+       "  <tbody>\n",
+       "    <tr>\n",
+       "      <th>0</th>\n",
+       "      <td>Fast Food</td>\n",
+       "      <td>10</td>\n",
+       "      <td>1</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>1</th>\n",
+       "      <td>Cakes &amp; Bakery</td>\n",
+       "      <td>2</td>\n",
+       "      <td>1</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>2</th>\n",
+       "      <td>Western</td>\n",
+       "      <td>1</td>\n",
+       "      <td>1</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>3</th>\n",
+       "      <td>Non-alcoholic Drinks</td>\n",
+       "      <td>1</td>\n",
+       "      <td>1</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>4</th>\n",
+       "      <td>Chinese</td>\n",
+       "      <td>4</td>\n",
+       "      <td>1</td>\n",
+       "    </tr>\n",
+       "  </tbody>\n",
+       "</table>\n",
+       "</div>"
+      ],
+      "text/plain": [
+       "                cuisine  Numbers of order  Customer_id\n",
+       "0             Fast Food                10            1\n",
+       "1        Cakes & Bakery                 2            1\n",
+       "2               Western                 1            1\n",
+       "3  Non-alcoholic Drinks                 1            1\n",
+       "4               Chinese                 4            1"
+      ]
+     },
+     "execution_count": 3,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "data.head()"
+   ]
+  },
+  {
+   "cell_type": "raw",
+   "id": "0136def8-2cc8-4959-bd6a-401f47947619",
+   "metadata": {},
+   "source": [
+    "Storing the average bookings of cuisines \n",
+    "Group seperate cuisine orders together\n",
+    "Rename columns\n",
+    "Show the number of orders possesed by the top 10% cuisines, based on number of orders\n",
+    "Get cuisines which has a substantial number of orders\n"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 4,
+   "id": "80915795-ace7-4f9d-a064-857415a54524",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "C = data[\"Numbers of order\"].mean()\n"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 5,
+   "id": "bf521826-3a4d-40fd-9987-b55f5333bc42",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "data1 = data.groupby(['cuisine'])['Numbers of order'].agg(['mean','count'])"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 6,
+   "id": "9d64b6d8-f5fc-4386-bf8d-2d41af9deaab",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "data1.rename(columns={'mean':'average_orders','count':'orders'},inplace=True)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 7,
+   "id": "8e474bd8-bbad-4486-9155-aafbe454a05e",
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "58.39999999999999\n"
+     ]
+    }
+   ],
+   "source": [
+    "q = data1['orders'].quantile(0.9)\n",
+    "print(q)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 8,
+   "id": "4c63155c-d37c-4548-af0b-7654332f0bfa",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "top_cuisines = data1.copy().loc[data1['orders']>=q]"
+   ]
+  },
+  {
+   "cell_type": "raw",
+   "id": "349183cf-497d-4a80-91e5-491b70e4f356",
+   "metadata": {},
+   "source": []
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 9,
+   "id": "ba44ae58-569f-45f7-8ed5-3b6bbe57373a",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "def weighted_rating(x, m=q, c=C):\n",
+    "    v = x['orders']\n",
+    "    R = x['average_orders']\n",
+    "    return (v/(v+m) * R) + (m/(m+v) * C)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 10,
+   "id": "ca91e451-7d6e-4164-bb7a-d5b0217eca67",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "top_cuisines['Score']=top_cuisines.apply(weighted_rating, axis=1)\n",
+    "data1['Score']=data1.apply(weighted_rating, axis=1)"
+   ]
+  },
+  {
+   "cell_type": "raw",
+   "id": "8fb0ba74-0577-46c1-9743-aa009e889f7b",
+   "metadata": {},
+   "source": [
+    "In this section We sort the top cuisines and print the top 3 \n"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 11,
+   "id": "548caf9b-4965-4ab1-8246-f92728a6c1ab",
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/html": [
+       "<div>\n",
+       "<style scoped>\n",
+       "    .dataframe tbody tr th:only-of-type {\n",
+       "        vertical-align: middle;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe tbody tr th {\n",
+       "        vertical-align: top;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe thead th {\n",
+       "        text-align: right;\n",
+       "    }\n",
+       "</style>\n",
+       "<table border=\"1\" class=\"dataframe\">\n",
+       "  <thead>\n",
+       "    <tr style=\"text-align: right;\">\n",
+       "      <th></th>\n",
+       "      <th>orders</th>\n",
+       "      <th>average_orders</th>\n",
+       "      <th>Score</th>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>cuisine</th>\n",
+       "      <th></th>\n",
+       "      <th></th>\n",
+       "      <th></th>\n",
+       "    </tr>\n",
+       "  </thead>\n",
+       "  <tbody>\n",
+       "    <tr>\n",
+       "      <th>Chinese</th>\n",
+       "      <td>87</td>\n",
+       "      <td>11.574713</td>\n",
+       "      <td>8.598197</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>Singaporean</th>\n",
+       "      <td>86</td>\n",
+       "      <td>8.302326</td>\n",
+       "      <td>6.628655</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>Fast Food</th>\n",
+       "      <td>71</td>\n",
+       "      <td>4.450704</td>\n",
+       "      <td>4.321313</td>\n",
+       "    </tr>\n",
+       "  </tbody>\n",
+       "</table>\n",
+       "</div>"
+      ],
+      "text/plain": [
+       "             orders  average_orders     Score\n",
+       "cuisine                                      \n",
+       "Chinese          87       11.574713  8.598197\n",
+       "Singaporean      86        8.302326  6.628655\n",
+       "Fast Food        71        4.450704  4.321313"
+      ]
+     },
+     "execution_count": 11,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "#Sort best cuisines based on their orders\n",
+    "top_cuisines = top_cuisines.sort_values('Score',ascending=False)\n",
+    "\n",
+    "#Print the top 3 meals\n",
+    "top_cuisines[[ 'orders', 'average_orders', 'Score']].head(3)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "04173247-54c0-488d-8f1c-437e6fe87ee6",
+   "metadata": {},
+   "outputs": [],
+   "source": []
+  }
+ ],
+ "metadata": {
+  "kernelspec": {
+   "display_name": "Python 3 (ipykernel)",
+   "language": "python",
+   "name": "python3"
+  },
+  "language_info": {
+   "codemirror_mode": {
+    "name": "ipython",
+    "version": 3
+   },
+   "file_extension": ".py",
+   "mimetype": "text/x-python",
+   "name": "python",
+   "nbconvert_exporter": "python",
+   "pygments_lexer": "ipython3",
+   "version": "3.9.12"
+  }
+ },
+ "nbformat": 4,
+ "nbformat_minor": 5
+}
